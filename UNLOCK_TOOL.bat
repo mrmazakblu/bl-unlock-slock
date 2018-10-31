@@ -147,8 +147,8 @@ GOTO:EOF
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
-echo [*] 
-echo [*] 
+echo [*] Magisk can Simply be flashed in TwrP
+echo [*] If You prefer to patch ramdisk instead, This can Help. (if needed)
 echo.--------------------------------------------------------------------------------
 echo.
 for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":root_" "%~f0""') do echo.  %%B  %%C
