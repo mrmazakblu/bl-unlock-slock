@@ -30,8 +30,6 @@ GOTO:menuLOOP
 :menu_1  Get_Slock.bin
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 echo [*] This step is to be done FIRST
 echo [*] 
@@ -54,8 +52,6 @@ files\fastboot.exe flash slock slock.bin
 :menu_2 Flash_custom_recovery         
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 echo [*] This step is to be done AFTER you flash SLOCK.bin 
 echo [*] 
@@ -73,8 +69,6 @@ GOTO:EOF
 :recovery_1 Flash TwRP_on_erecovery
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 echo First you must turn on ADB DEBUGGING in your settings 
 echo go to device options then click on build number 7 times to enable 
@@ -116,8 +110,6 @@ GOTO:EOF
 :recovery_2 Flash TWRP 
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 echo First you must turn on ADB DEBUGGING in your settings 
 echo go to device options then click on build number 7 times to enable 
@@ -162,8 +154,6 @@ GOTO:EOF
 :root_1 Pull_ramdisk_with_twrp 
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo [*] This step will reboot into TWRP (IF INSTALLED)and Copy the currently
 echo [*] Instaled ramdisk to your pc, then reboot back to Android
 echo [*] Then it will copy that file into the Download folder.
@@ -183,8 +173,6 @@ GOTO:EOF
 :root_2 Download_Magisk
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 echo [*] You should get latest release of the magisk manager.
 echo [*] A new internet tab/ Window should open next on your PC
@@ -199,8 +187,6 @@ GOTO:EOF
 :root_3 Pull_and _flash-patched_ramdisk
 cls
 color 0b
-files\adb.exe kill-server
-files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
 files\adb.exe pull /sdcard/Download/patched_boot.img
 timeout 4 > nul
@@ -243,19 +229,19 @@ echo.
 files\adb.exe kill-server
 files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
+echo [*] Checking for attached devices, both adb or fastboot
 files\adb.exe devices
 timeout 5 > nul
 files\fastboot.exe devices
 timeout 3 > nul
 files\adb.exe kill-server
-pause
 cls	
 color 0b
 GOTO:EOF
 
 :printstatus
 echo.
-echo. 
+echo. CHOOSE OPTION TO RUN
 echo. 
 echo.
 echo.--------------------------------------------------------------------------------
