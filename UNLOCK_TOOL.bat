@@ -64,6 +64,8 @@ cls
 color 0b
 echo.--------------------------------------------------------------------------------
 echo [*] This step is to be done AFTER you flash SLOCK.bin 
+echo [*] If you reboot Phone Before Flahing TwRP
+echo [*] You will Need to Start Over with step 1 Get-Slock.bin
 echo [*] 
 echo.--------------------------------------------------------------------------------
 echo.
@@ -80,16 +82,14 @@ GOTO:EOF
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
-echo First you must turn on ADB DEBUGGING in your settings 
-echo go to device options then click on build number 7 times to enable 
-echo developer options then in developer options turn on Enable adb option.
-echo also make sure your drivers are installed 
+echo [*] Phone should already be in Fastboot Mode
+echo [*] If It is Not Something has Gone Wrong And You Probably need to Start Over
+echo [*] If you reboot Phone Before Flahing TwRP
+echo [*] You will Need to Start Over with step 1 Get-Slock.bin
 echo.--------------------------------------------------------------------------------
 pause
 cls
 echo.--------------------------------------------------------------------------------
-echo [*] NOTE this will not work unless your fastboot drivers are installed
-echo [*] 
 echo [*] press any key to continue the script.
 echo.--------------------------------------------------------------------------------
 pause > nul
