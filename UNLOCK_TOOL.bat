@@ -32,7 +32,8 @@ cls
 color 0b
 echo.--------------------------------------------------------------------------------
 echo [*] This step is to be done FIRST
-echo [*] 
+echo [*] If you reboot Phone Before Flahing TwRP
+echo [*] You will Need to Start Over
 echo.--------------------------------------------------------------------------------
 echo.
 cls
@@ -47,6 +48,15 @@ files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
 files\mystery-binary1 fblock.txt slock.bin
 files\fastboot.exe flash slock slock.bin 
+echo.--------------------------------------------------------------------------------
+echo [*] Slock file should have Been flashed, Now do menu step 2 
+echo [*] To Flash TWRP on Device (on E-recovery)
+echo.--------------------------------------------------------------------------------
+echo.
+timeout 5
+color 0b	
+cls
+GOTO:EOF
 
 
 :menu_2 Flash_custom_recovery         
@@ -77,11 +87,9 @@ echo also make sure your drivers are installed
 echo.--------------------------------------------------------------------------------
 pause
 cls
-files\adb.exe reboot bootloader
-cls
 echo.--------------------------------------------------------------------------------
 echo [*] NOTE this will not work unless your fastboot drivers are installed
-echo [*] Once the screen says fastboot
+echo [*] 
 echo [*] press any key to continue the script.
 echo.--------------------------------------------------------------------------------
 pause > nul
@@ -107,7 +115,7 @@ files\adb.exe shell dd if=/tmp/nvme-patched of=/dev/block/bootdevice/by-name/nvm
 cls
 GOTO:EOF
 
-:recovery_2 Flash TWRP 
+:recovery_2 Flash TWRP(optional)_ONLY-AFTER-#1-IS-DONE 
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
