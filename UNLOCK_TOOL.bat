@@ -36,6 +36,12 @@ echo [*] If you reboot Phone Before Flahing TwRP
 echo [*] You will Need to Start Over
 echo.--------------------------------------------------------------------------------
 echo.
+for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":slock_" "%~f0""') do echo.  %%B  %%C
+	set choice=
+	echo.&set /p choice= Please make a selection or hit ENTER to exit: ||GOTO:EOF
+	echo.&call:recovery_%choice%
+
+:slock_1 GET_info
 cls
 files\adb.exe reboot bootloader
 echo.--------------------------------------------------------------------------------
@@ -46,6 +52,30 @@ echo.
 pause
 files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
+::files\mystery-binary1 fblock.txt slock.bin
+::files\fastboot.exe flash slock slock.bin 
+echo.--------------------------------------------------------------------------------
+::echo [*] Slock file should have Been flashed, Now do menu step 2 
+::echo [*] To Flash TWRP on Device (on E-recovery)
+echo [*] Now data has been pulled from phone. Send the fblock.txt
+echo [*] To telegram support group at https://t.me/huaweihax
+echo [*] Tag it with #niceguys. 
+echo [*] Leave phone in fastboot untill you get a response with slock.bin
+echo.--------------------------------------------------------------------------------
+echo.
+timeout 5
+color 0b	
+cls
+GOTO:EOF
+
+:slock_2 FLASH_slock
+cls
+echo.--------------------------------------------------------------------------------
+echo [*] 
+echo [*] 
+echo.--------------------------------------------------------------------------------
+echo.
+pause
 files\mystery-binary1 fblock.txt slock.bin
 files\fastboot.exe flash slock slock.bin 
 echo.--------------------------------------------------------------------------------
