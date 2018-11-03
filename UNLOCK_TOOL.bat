@@ -137,12 +137,29 @@ echo.---------------------------------------------------------------------------
 echo [*] Do NOT continue the script until TWRP is booted
 echo.--------------------------------------------------------------------------------
 pause
+echo.--------------------------------------------------------------------------------
+echo [*] As long as twrp has booted, next run 1.5 to modify mvne to unlock bootloader
+echo.--------------------------------------------------------------------------------
+pause
+cls
+GOTO:EOF
+
+
+:recovery_1.5 Read modify-reflash_mvne
+echo.--------------------------------------------------------------------------------
+echo [*] This part of tool requires to be done from TWRP (as root is needed)
+echo.--------------------------------------------------------------------------------
+pause
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
 files\adb.exe pull /tmp/nvme original-nvme
-files\dd.exe if=original-nvme of=modified-nvme
-call files\nvme-edit.bat
-files\adb.exe push modified-nvme /tmp/modified-nvme
-files\adb.exe shell dd if=/tmp/modified-nvme of=/dev/block/bootdevice/by-name/nvme
+if exist original-nvme (
+	files\dd.exe if=original-nvme of=modified-nvme
+	call files\nvme-edit.bat
+	files\adb.exe push modified-nvme /tmp/modified-nvme
+	files\adb.exe shell dd if=/tmp/modified-nvme of=/dev/block/bootdevice/by-name/nvme
+) else (
+	echo [**] NVME file not found. Make sure twrp is loaded and adb is working)
+pause
 cls
 GOTO:EOF
 
