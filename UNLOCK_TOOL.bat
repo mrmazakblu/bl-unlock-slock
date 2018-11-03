@@ -40,6 +40,9 @@ for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:
 	set choice=
 	echo.&set /p choice= Please make a selection or hit ENTER to return to last menu: ||GOTO:EOF
 	echo.&call:slock_%choice%
+color 0b	
+cls
+GOTO:EOF
 
 :slock_1 GET_info
 cls
@@ -61,7 +64,7 @@ echo [*] Now data has been pulled from phone. Send the fblock.txt
 echo [*] To telegram support group at https://t.me/huaweihax
 echo [*] Tag it with #niceguys. 
 echo [*] Leave phone in fastboot untill you get a response with slock.bin
-echo [*] You can leave from this menu. The screen may loop back to the start of this step
+echo [*] You can leave from this menu
 echo [*] You can Return to Menu 1 "Slock" then "Flash_slock" when you have received the file
 echo [*] When You have the file received from support group (file name likely named "res")
 echo [*] Copy that file to same Directory as "fblock.txt" and select option 1 "slock" 
@@ -76,8 +79,8 @@ GOTO:EOF
 :slock_2 FLASH_slock
 cls
 echo.--------------------------------------------------------------------------------
-echo [*] 
-echo [*] 
+echo [*] Now We flash the "res" file to slock. This will cause bootloader to be 
+echo [*] Unlocked to allow twrp on erecovery.
 echo.--------------------------------------------------------------------------------
 echo.
 pause
@@ -88,7 +91,7 @@ echo [*] Slock file should have Been flashed, Now do menu step 2
 echo [*] To Flash TWRP on Device (on E-recovery)
 echo.--------------------------------------------------------------------------------
 echo.
-timeout 5
+pause
 color 0b	
 cls
 GOTO:EOF
