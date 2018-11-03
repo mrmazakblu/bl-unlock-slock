@@ -1,8 +1,0 @@
-...
-(bootloader) FBLOCK4f2d15cffe7c6aaf
-OKAY [  0.037s]
-finished. total time: 0.037s
-...
-(bootloader) BND-L24
-OKAY [  0.005s]
-finished. total time: 0.005s

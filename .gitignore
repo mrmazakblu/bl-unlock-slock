@@ -21,3 +21,8 @@ $RECYCLE.BIN/
 # =========================
 # Operating System Files
 # =========================
+
+# working filrs to ignore
+fblock.txt
+modified-nvme
+original-nvme
