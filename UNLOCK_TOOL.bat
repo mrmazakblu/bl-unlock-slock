@@ -38,7 +38,7 @@ echo.---------------------------------------------------------------------------
 echo.
 for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":slock_" "%~f0""') do echo.  %%B  %%C
 	set choice=
-	echo.&set /p choice= Please make a selection or hit ENTER to exit: ||GOTO:EOF
+	echo.&set /p choice= Please make a selection or hit ENTER to return to last menu: ||GOTO:EOF
 	echo.&call:slock_%choice%
 
 :slock_1 GET_info
@@ -63,7 +63,7 @@ echo [*] Tag it with #niceguys.
 echo [*] Leave phone in fastboot untill you get a response with slock.bin
 echo.--------------------------------------------------------------------------------
 echo.
-timeout 5
+pause
 color 0b	
 cls
 GOTO:EOF
