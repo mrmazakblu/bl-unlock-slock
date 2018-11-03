@@ -138,10 +138,11 @@ echo [*] Do NOT continue the script until TWRP is booted
 echo.--------------------------------------------------------------------------------
 pause
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
-files\adb.exe pull /tmp/nvme
-files\mystery-binary2 nvme nvme-patched
-files\adb.exe push nvme-patched /tmp/nvme-patched
-files\adb.exe shell dd if=/tmp/nvme-patched of=/dev/block/bootdevice/by-name/nvme
+files\adb.exe pull /tmp/nvme original-nvme
+files\dd.exe if=original-nvme of=modified-nvme
+call files\nvme-edit.bat
+files\adb.exe push modified-nvme /tmp/modified-nvme
+files\adb.exe shell dd if=/tmp/modified-nvme of=/dev/block/bootdevice/by-name/nvme
 cls
 GOTO:EOF
 
