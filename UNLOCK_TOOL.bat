@@ -55,8 +55,8 @@ echo.
 pause
 files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
-::files\mystery-binary1 fblock.txt slock.bin
-::files\fastboot.exe flash slock slock.bin 
+::type slock.txt | files/xxd.exe -r -p > binary-slock 
+::files\fastboot.exe flash slock binary-slock
 echo.--------------------------------------------------------------------------------
 ::echo [*] Slock file should have Been flashed, Now do menu step 2 
 ::echo [*] To Flash TWRP on Device (on E-recovery)
@@ -84,8 +84,6 @@ echo [*] Unlocked to allow twrp on erecovery.
 echo.--------------------------------------------------------------------------------
 echo.
 pause
-::files\mystery-binary1 fblock.txt slock.bin
-::files\fastboot.exe flash slock slock.bin
 if exist res (
 	files\fastboot.exe flash slock res
 	echo.--------------------------------------------------------------------------------
