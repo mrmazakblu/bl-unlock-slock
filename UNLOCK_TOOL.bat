@@ -85,11 +85,18 @@ echo.---------------------------------------------------------------------------
 echo.
 pause
 ::files\mystery-binary1 fblock.txt slock.bin
-files\fastboot.exe flash slock res
-echo.--------------------------------------------------------------------------------
-echo [*] Slock file should have Been flashed, Now do menu step 2 
-echo [*] To Flash TWRP on Device (on E-recovery)
-echo.--------------------------------------------------------------------------------
+::files\fastboot.exe flash slock slock.bin
+if exist res (
+	files\fastboot.exe flash slock res
+	echo.--------------------------------------------------------------------------------
+	echo [*] Slock file should have Been flashed, Now do menu step 2 
+	echo [*] To Flash TWRP on Device (on E-recovery)
+	echo.--------------------------------------------------------------------------------
+) else (
+	echo.--------------------------------------------------------------------------------
+	echo [**] RES file not found. Make sure you copied received patched file from #niceguys
+	echo [**] And placd it into same directory as the fblock.txt)
+	echo.--------------------------------------------------------------------------------
 echo.
 pause
 color 0b	
