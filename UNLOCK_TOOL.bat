@@ -55,6 +55,8 @@ echo.
 pause
 files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
+:: convert fblock.txt and model into 512 byte file signed with rsa key
+:: This part just waiting on process to add key to fblock >> to slock.txt
 ::type slock.txt | files/xxd.exe -r -p > binary-slock 
 ::files\fastboot.exe flash slock binary-slock
 echo.--------------------------------------------------------------------------------
