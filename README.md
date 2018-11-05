@@ -8,4 +8,4 @@ Basic batch tool to help with the HAX method of unlocking HUAWEI bootloader, usi
 ##INCLUDED##
 
 dd.exe is included as a tool. from http://www.chrysocome.net/dd
-
+xdd.exe is included from VIM 7 package from http://www.vim.org/
