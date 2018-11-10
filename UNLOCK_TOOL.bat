@@ -227,7 +227,8 @@ cls
 color 0b
 echo [*] This step will reboot into TWRP (IF INSTALLED)and Copy the currently
 echo [*] Instaled ramdisk to your pc, then reboot back to Android
-echo [*] Then it will copy that file into the Download folder.
+echo [*] Then it will copy that file back into the Download folder.
+echo [*] From inside android you will use the magisk manager to "patch" it.
 echo.--------------------------------------------------------------------------------
 files\adb.exe reboot recovery
 echo [*] Press any key to continue ONLY when twrp has loaded
