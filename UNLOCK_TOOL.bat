@@ -297,15 +297,16 @@ echo           "                  |_|                              "
 echo           """""""""""""""""""""""""""""""""""""""""""""""""""""
 echo.--------------------------------------------------------------------------------
 echo.
+echo [*] Force restarting the adb server. Just in case it might be needed
 files\adb.exe kill-server
 files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
-echo [*] Checking for attached devices, both adb or fastboot
+echo [*] Checking for attached devices with adb (inside android)
 files\adb.exe devices
-timeout 5 > nul
+timeout 3 > nul
+echo [*] Now Checking for attached devices with fastboot (inside bootloader)
 files\fastboot.exe devices
 timeout 3 > nul
-files\adb.exe kill-server
 cls	
 color 0b
 GOTO:EOF
