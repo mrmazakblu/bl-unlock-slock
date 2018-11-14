@@ -7,7 +7,8 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 ::Set our default parameters
 @echo off
 color 0b
-
+cd "%~dp0"
+SET PATH=%PATH%;"%~dp0"
 
 
 :menuLOOP
@@ -138,13 +139,18 @@ if exist res (
 	echo.--------------------------------------------------------------------------------
 	echo [**] RES file not found. Make sure you copied received patched file from #niceguys
 	echo [**] And placd it into same directory as the fblock.txt
-	echo.-------------------------------------------------------------------------------- )
+	echo.--------------------------------------------------------------------------------
+	pause
+	GOTO:EOF )
 echo.
 pause
 if not exist flash-slock-message.txt ( echo.--------------------------------------------------------------------------------
 	echo [*] flash-slock-message.txt was NOT created for unknown reason. 
 	echo [*] CANNOT VERIFY IF SLOCK was FLASHED
-	echo [*] Flashing Recovery May Fail. Cannot determine at this time. )
+	echo [*] Flashing Recovery May Fail. Cannot determine at this time.
+	echo [*] Return to last step again and FLASH-SLOCK Again
+	pause
+	GOTO:EOF )
 set slock-status=""
 for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-slock-message.txt""') do set slock-status="%%A"
 if %slock-status%=="" ( echo [*]--------------------------------------------------------------------
@@ -215,7 +221,7 @@ if %erecovery%=="slocked" ( files\fastboot.exe flash erecovery_ramdisk files\TWR
 	echo.--------------------------------------------------------------------------------
 ) else (
 	echo [*] Slock Flashing HAS FAILED, YOU CANNOT FLASH RECOVERY YET
-	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINING )
+	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINNING )
 pause
 files\fastboot.exe reboot
 color 0b	
@@ -226,7 +232,7 @@ GOTO:EOF
 
 :recovery_2 Read mvne
 echo.--------------------------------------------------------------------------------
-echo [*] This part of tool requires to be done from TWRP (as root is needed)
+echo [*] This part of tool MUST be done from TWRP (as root is needed)
 echo.--------------------------------------------------------------------------------
 pause
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
@@ -247,7 +253,7 @@ pause
 if exist modified-nvme (
 	call files\nvme-edit.bat
 ) else (
-	echo [**] NVME file not found. Make sure You perfprmed Step 2 First)
+	echo [**] NVME file not found. Make sure You performed Step 2 First)
 pause
 cls
 GOTO:EOF
@@ -366,24 +372,24 @@ if exist patched_boot.img (
 cls        
 color 0e
 echo.          
-echo           """""""""""""""""""""""""""""""""""""""""""""""""""""          
-echo           "______ _         _   _                          _  "
-echo           "| ___ (_)       | | | |                        (_) "
-echo           "| |_/ /_  __ _  | |_| |_   _  __ ___      _____ _  "
-echo           "| ___ \ |/ _` | |  _  | | | |/ _` \ \ /\ / / _ \ | "
-echo           "| |_/ / | (_| | | | | | |_| | (_| |\ V  V /  __/ | "
-echo           "\____/|_|\__, | \_| |_/\__,_|\__,_| \_/\_/ \___|_| "
-echo           "          __/ |                                    "
-echo           "         |___/                                     "
-echo           "         _____           _       _ _               "
-echo           "        |  ___|         | |     (_) |              "
-echo           "        | |____  ___ __ | | ___  _| |_ ___         "
-echo           "        |  __\ \/ / '_ \| |/ _ \| | __/ __|        "
-echo           "        | |___>  <| |_) | | (_) | | |_\__ \        "
-echo           "        \____/_/\_\ .__/|_|\___/|_|\__|___/        "
-echo           "                  | |                              "
-echo           "                  |_|                              "
-echo           """""""""""""""""""""""""""""""""""""""""""""""""""""
+echo           """"""""""""""""""""""""""""""""""""""""""""""""""""""          
+echo           " ______ _         _   _                          _  "
+echo           " | ___ (_)       | | | |                        (_) "
+echo           " | |_/ /_  __ _  | |_| |_   _  __ ___      _____ _  "
+echo           " | ___ \ |/ _` | |  _  | | | |/ _` \ \ /\ / / _ \ | "
+echo           " | |_/ / | (_| | | | | | |_| | (_| |\ V  V /  __/ | "
+echo           " \____/|_|\__, | \_| |_/\__,_|\__,_| \_/\_/ \___|_| "
+echo           "           __/ |                                    "
+echo           "          |___/                                     "
+echo           "          _____           _       _ _               "
+echo           "         |  ___|         | |     (_) |              "
+echo           "         | |____  ___ __ | | ___  _| |_ ___         "
+echo           "         |  __\ \/ / '_ \| |/ _ \| | __/ __|        "
+echo           "         | |___>  <| |_) | | (_) | | |_\__ \        "
+echo           "         \____/_/\_\ .__/|_|\___/|_|\__|___/        "
+echo           "                   | |                              "
+echo           "                   |_|                              "
+echo           """"""""""""""""""""""""""""""""""""""""""""""""""""""
 echo.--------------------------------------------------------------------------------
 echo.
 echo [*] Force restarting the adb server. Just in case it might be needed
@@ -398,12 +404,15 @@ echo [*] Now Checking for attached devices with fastboot (inside bootloader)
 for /f "tokens=*" %%i in ('files\fastboot.exe devices') do set mode="FASTBOOT"
 timeout 3
 cls	
+files\adb.exe kill-server
 color 0b
 GOTO:EOF
 
 :printstatus
 echo. 
+echo.--------------------------------------------------------------------------------
 echo. [*]Phone is Currently IN %mode%
+echo. [*]Running From %~dp0
 echo. 
 echo. [**]CHOOSE OPTION TO RUN
 echo.--------------------------------------------------------------------------------
