@@ -15,7 +15,9 @@ color 0b
 	call:header
 	::Print our header
 	::call:header
-	
+	if %mode%=="DISCONNECTED-STATE" ( echo.-----------------------------------------------
+		echo [***] PHONE NOT CONNECTED
+		echo [***] Some Functions Will Fail )
 	::Load up our menu selections
 	echo.--------------------------------------------------------------------------------
 	for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":menu_" "%~f0""') do echo.  %%B  %%C
@@ -46,40 +48,80 @@ GOTO:EOF
 
 :slock_1 GET_info
 cls
+if %mode%=="DISCONNECTED-STATE" ( echo.-----------------------------------------------
+echo [**] This process will not work While phone shows not connected 
+pause
+GOTO:EOF )
+if %mode%=="ADB" ( echo [*] REBOOTING TO BOOTLOADER
 files\adb.exe reboot bootloader
 echo.--------------------------------------------------------------------------------
 echo [*] When Fastboot has loaded Press any key to continue
 echo [*] 
 echo.--------------------------------------------------------------------------------
 echo.
-pause
+pause )
 files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
-:: convert fblock.txt and model into 512 byte file signed with rsa key
-:: This part just waiting on process to add key to fblock >> to slock.txt
-::type slock.txt | files/xxd.exe -r -p > binary-slock 
-::files\fastboot.exe flash slock binary-slock
-echo.--------------------------------------------------------------------------------
-::echo [*] Slock file should have Been flashed, Now do menu step 2 
-::echo [*] To Flash TWRP on Device (on E-recovery)
-echo [*] Now data has been pulled from phone. Send the fblock.txt
-echo [*] To telegram support group at https://t.me/huaweihax
-echo [*] Tag it with #niceguys. 
-echo [*] Leave phone in fastboot untill you get a response with slock.bin
-echo [*] You can leave from this menu
-echo [*] You can Return to Menu 1 "Slock" then "Flash_slock" when you have received the file
-echo [*] When You have the file received from support group (file name likely named "res")
-echo [*] Copy that file to same Directory as "fblock.txt" and select option 1 "slock" 
-echo [*] Then option 2 "FLASH_slock"
-echo.--------------------------------------------------------------------------------
+timeout 3
+if exist fblock.txt ( echo.--------------------------------------------------------------------------------
+	echo [*] Now data has been pulled from phone. Send the fblock.txt
+	echo [*] To telegram support group at https://t.me/huaweihax
+	echo [*] Tag it with #niceguys. 
+	echo [*] Leave phone in fastboot untill you get a response with slock.bin
+	echo [*] You can leave from this menu
+	echo [*] Return with Menu 1 "Slock" then when you have received the file
+	echo [*] When You have the file received from support group
+	echo [*] Copy that file "res" to same Directory as "fblock.txt" 
+	echo [*] Then option 3 "FLASH_slock" Or Option 2 to convert if needed
+	echo.-------------------------------------------------------------------------------- )
+if not exist fblock.txt ( echo.--------------------------------------------------------------------------------
+	echo [*] SOMETHING HAS GONE WRONG the fblock.txt was NOT FOUND
+	echo [*] Restart the Step to see if it works
+	echo.-------------------------------------------------------------------------------- )
 echo.
 pause
 color 0b	
 cls
 GOTO:EOF
 
-:slock_2 FLASH_slock
+:slock_2 Convert Slock-txt_to_RES
 cls
+echo.--------------------------------------------------------------------------------
+echo [*] When You receive the long string of characters (512 to be exact)
+echo [*] from the niceguys at https://t.me/huaweihax copy it to a txt file in this 
+echo [*] Folder %~dp0  
+echo [*] Name the file "slock.txt"
+echo.--------------------------------------------------------------------------------
+echo.
+pause
+if exist slock.txt (
+	type slock.txt | files/xxd.exe -r -p > res
+	echo.--------------------------------------------------------------------------------
+	echo [*] Now Run option 3 "FLASH_slock"
+	echo.--------------------------------------------------------------------------------
+) else (
+	echo.--------------------------------------------------------------------------------
+	echo [**] RES file not found. Make sure you copied code received from #niceguys)
+	echo.--------------------------------------------------------------------------------
+echo.
+pause
+color 0b	
+cls
+GOTO:EOF
+
+:slock_3 FLASH_slock_RES
+cls
+if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
+echo [*] Phone has been rebooted, Your code in no longer VALID 
+echo [*] Start over with get-slock
+echo.
+pause 
+GOTO:EOF )
+if %mode%=="DISCONNECTED-STATE" ( echo.--------------------------------------------------------------------------------
+echo [*] Phone NOT DETECTED, MAKE SURE CABLE IS CONNECTED, TRY AGAIN
+echo.
+pause 
+GOTO:EOF )
 echo.--------------------------------------------------------------------------------
 echo [*] Now We flash the "res" file to slock. This will cause bootloader to be 
 echo [*] Unlocked to allow twrp on erecovery.
@@ -87,17 +129,29 @@ echo.---------------------------------------------------------------------------
 echo.
 pause
 if exist res (
-	files\fastboot.exe flash slock res
+	files\fastboot.exe flash slock res 2> flash-slock-message.txt
 	echo.--------------------------------------------------------------------------------
-	echo [*] Slock file should have Been flashed, Now do menu step 2 
-	echo [*] To Flash TWRP on Device (on E-recovery)
+	echo [*] Slock file should have Been flashed, error checking hapens next. 
+	echo [*] 
 	echo.--------------------------------------------------------------------------------
 ) else (
 	echo.--------------------------------------------------------------------------------
 	echo [**] RES file not found. Make sure you copied received patched file from #niceguys
-	echo [**] And placd it into same directory as the fblock.txt)
-	echo.--------------------------------------------------------------------------------
+	echo [**] And placd it into same directory as the fblock.txt
+	echo.-------------------------------------------------------------------------------- )
 echo.
+pause
+if not exist flash-slock-message.txt ( echo.--------------------------------------------------------------------------------
+	echo [*] flash-slock-message.txt was NOT created for unknown reason. 
+	echo [*] CANNOT VERIFY IF SLOCK was FLASHED
+	echo [*] Flashing Recovery May Fail. Cannot determine at this time. )
+set slock-status=""
+for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-slock-message.txt""') do set slock-status="%%A"
+if %slock-status%=="" ( echo [*]--------------------------------------------------------------------
+	echo [*] Fail message not found 
+	set erecovery="slocked" )
+::find /i "FAILED" "flash-slock-message.txt"
+::if errorlevel 1 ( echo some bull-shit here )
 pause
 color 0b	
 cls
@@ -108,7 +162,7 @@ GOTO:EOF
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
-echo [*] This step is to be done AFTER you flash SLOCK.bin 
+echo [*] This step is to be done ONLY AFTER you flash SLOCK.bin 
 echo [*] If you reboot Phone Before Flahing TwRP
 echo [*] You will Need to Start Over with step 1 Get-Slock.bin
 echo [*] 
@@ -126,6 +180,17 @@ GOTO:EOF
 :recovery_1 Flash TwRP_on_erecovery
 cls
 color 0b
+if %mode%=="DISCONNECTED-STATE" ( echo.--------------------------------------------------------------------------------
+echo [*] Phone NOT DETECTED, MAKE SURE CABLE IS CONNECTED, TRY AGAIN
+echo.
+pause 
+GOTO:EOF )
+if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
+echo [*] Phone has been rebooted, Your code in no longer VALID 
+echo [*] Start over with get-slock
+echo.
+pause 
+GOTO:EOF )
 echo.--------------------------------------------------------------------------------
 echo [*] Phone should already be in Fastboot Mode
 echo [*] If It is Not Something has Gone Wrong And You Probably need to Start Over
@@ -138,29 +203,28 @@ echo.---------------------------------------------------------------------------
 echo [*] press any key to continue the script.
 echo.--------------------------------------------------------------------------------
 pause > nul
-files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img
-timeout 5
-echo.--------------------------------------------------------------------------------
-echo [*] You must Boot to TWRP Manualy
-echo [*] Hold volume up AFTER the phone vibrates
-echo [*] Twrp should boot up. If not, reboot it and try 3d again
-echo.--------------------------------------------------------------------------------
+if %erecovery%=="slocked" ( files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img
+	timeout 5
+	echo.--------------------------------------------------------------------------------
+	echo [*] You must Boot to TWRP Manualy
+	echo [*] Hold volume up AFTER the phone vibrates
+	echo [*] Twrp should boot up. If not, reboot it and try it again
+	echo.--------------------------------------------------------------------------------
+	echo [*] Do NOT continue the modifying phone till mvne is edited
+	echo [*] As long as twrp has booted, do 2,3,4 to modify mvne to unlock bootloader
+	echo.--------------------------------------------------------------------------------
+) else (
+	echo [*] Slock Flashing HAS FAILED, YOU CANNOT FLASH RECOVERY YET
+	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINING )
 pause
 files\fastboot.exe reboot
 color 0b	
-echo.--------------------------------------------------------------------------------
-echo [*] Do NOT continue the script until TWRP is booted
-echo.--------------------------------------------------------------------------------
-pause
-echo.--------------------------------------------------------------------------------
-echo [*] As long as twrp has booted, next run 1.5 to modify mvne to unlock bootloader
-echo.--------------------------------------------------------------------------------
 pause
 cls
 GOTO:EOF
 
 
-:recovery_1.5 Read modify-reflash_mvne
+:recovery_2 Read mvne
 echo.--------------------------------------------------------------------------------
 echo [*] This part of tool requires to be done from TWRP (as root is needed)
 echo.--------------------------------------------------------------------------------
@@ -169,7 +233,31 @@ files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
 files\adb.exe pull /tmp/nvme original-nvme
 if exist original-nvme (
 	files\dd.exe if=original-nvme of=modified-nvme
+) else (
+	echo [**] NVME file not found. Make sure twrp is loaded and adb is working )
+pause
+cls
+GOTO:EOF
+
+:recovery_3 Modify mvne
+echo.--------------------------------------------------------------------------------
+echo [*] This part of tool requires only the tool itself
+echo.--------------------------------------------------------------------------------
+pause
+if exist modified-nvme (
 	call files\nvme-edit.bat
+) else (
+	echo [**] NVME file not found. Make sure You perfprmed Step 2 First)
+pause
+cls
+GOTO:EOF
+
+:recovery_4 Flash Modifyed_mvne
+echo.--------------------------------------------------------------------------------
+echo [*] This part of tool requires to be done from TWRP (as root is needed)
+echo.--------------------------------------------------------------------------------
+pause
+if exist modified-nvme (
 	files\adb.exe push modified-nvme /tmp/modified-nvme
 	files\adb.exe shell dd if=/tmp/modified-nvme of=/dev/block/bootdevice/by-name/nvme
 ) else (
@@ -178,7 +266,7 @@ pause
 cls
 GOTO:EOF
 
-:recovery_2 Flash TWRP(optional)_ONLY-AFTER-#1-IS-DONE 
+:recovery_5 Flash TWRP(optional)_ONLY-AFTER-#1-IS-DONE 
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
@@ -302,21 +390,22 @@ echo [*] Force restarting the adb server. Just in case it might be needed
 files\adb.exe kill-server
 files\adb.exe start-server
 echo.--------------------------------------------------------------------------------
+set mode="DISCONNECTED-STATE"
 echo [*] Checking for attached devices with adb (inside android)
-files\adb.exe devices
-timeout 3 > nul
+for /f "skip=1 tokens=*" %%i in ('files\adb.exe devices') do set mode="ADB"
+timeout 3
 echo [*] Now Checking for attached devices with fastboot (inside bootloader)
-files\fastboot.exe devices
-timeout 3 > nul
+for /f "tokens=*" %%i in ('files\fastboot.exe devices') do set mode="FASTBOOT"
+timeout 3
 cls	
 color 0b
 GOTO:EOF
 
 :printstatus
-echo.
-echo. CHOOSE OPTION TO RUN
 echo. 
-echo.
+echo. [*]Phone is Currently IN %mode%
+echo. 
+echo. [**]CHOOSE OPTION TO RUN
 echo.--------------------------------------------------------------------------------
 GOTO:EOF
 
