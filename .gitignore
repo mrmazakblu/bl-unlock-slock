@@ -31,3 +31,4 @@ original-nvme
 *.bak
 \update-logs
 \unlock-tool-update
+bl-unlock-slock-private-*.zip
