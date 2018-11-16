@@ -25,6 +25,7 @@ IF ERRORLEVEL 1 GOTO run
 :update
 IF EXIST "%~dp0unlock-tool-update" rd /s /q "%~dp0unlock-tool-update" /Q
 IF NOT EXIST "%~dp0unlock-tool-update" mkdir "%~dp0unlock-tool-update"
+IF NOT EXIST "%~dp0update-logs" mkdir "%~dp0update-logs"
 echo @echo off > %~dp0unlock-tool-update\unlock-tool-update.bat
 echo( >> %~dp0unlock-tool-update\unlock-tool-update.bat
 echo timeout 10 >> %~dp0unlock-tool-update\unlock-tool-update.bat
