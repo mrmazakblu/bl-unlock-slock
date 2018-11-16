@@ -2,8 +2,12 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 ::visit https://t.me/huaweihax
 
 ::Set our Window Title
-@title HUAWEI UNLOCK Tool V-3
-
+::DECLARE VARIABLES
+set mode=unset
+set slock-status=unset
+set erecovery=unset
+set ver=V-4
+@title HUAWEI UNLOCK Tool $ver$
 ::Set our default parameters
 @echo off
 color 0b
@@ -237,23 +241,22 @@ echo [*] Start over with get-slock
 echo.
 pause 
 GOTO:EOF )
+if %mode%=="FASTBOOT" ( echo CONTINUE
+) else (
+	GOTO:EOF )
 echo.--------------------------------------------------------------------------------
 echo [*] Phone should already be in Fastboot Mode
 echo [*] If It is Not Something has Gone Wrong And You Probably need to Start Over
 echo [*] If you reboot Phone Before Flahing TwRP
 echo [*] You will Need to Start Over with step 1 Get-Slock.bin
 echo.--------------------------------------------------------------------------------
-pause
-cls
-echo.--------------------------------------------------------------------------------
-echo [*] press any key to continue the script.
-echo.--------------------------------------------------------------------------------
 pause > nul
-if %erecovery%=="slocked" ( files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img 2> flash-twrp-message.txt
+if %erecovery%=="slocked" ( echo.--------------------------------------------------------------------------------
+	files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img 2> flash-twrp-message.txt
 	timeout 5
 	echo.--------------------------------------------------------------------------------
-	echo [*] TWRP file should have Been flashed, error checking hapens next. 
-	echo [*] 
+	echo [*] TWRP file should have Been flashed, error checking hapens next.
+	echo [*]
 	echo.--------------------------------------------------------------------------------
 ) else (
 	echo [*] Slock Flashing HAS FAILED, YOU CANNOT FLASH RECOVERY YET
@@ -271,15 +274,24 @@ set twrp-status=""
 for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-twrp-message.txt""') do set twrp-status="%%A"
 if %twrp-status%=="" ( echo [*]--------------------------------------------------------------------
 	echo [*] Fail message not found 
-	echo [*] Assumed no failed message means TWRP Flashed
+	echo [*] Assumed no failed message means TWRP Flashed ::needs improoved
 	echo [*]--------------------------------------------------------------------
 	echo [*] NEXT WE NEED TO REBOOT TO SYSTEM SO WE CAN ADB REBOOT TO ERECOVERY
-	set erecovery="flashed" )
+	set erecovery="flashed" 
+) else (
+	echo [*] Fail message found 
+	echo [*] Failed message means TWRP NOT Flashed
+	echo [*]--------------------------------------------------------------------
+	echo [*] Return to This step again and FLASH-TWRP Again. But you will most
+	echo [*] Likely need to start over AGAIN 
+	pause
+	GOTO:EOF )
 pause
 if %erecovery%=="flashed" ( files\fastboot.exe reboot
 	echo [*]--------------------------------------------------------------------
 	echo [*] WHEN PHONE FINISHED WITH REBOOT, VERIFY ADB IS ENABLED
 	echo [*] AND PRESS ANY BUTTON TO CONTINUE --Run Recovery step 2 "READ"
+	echo [*] Continueing should reboot to e-recovery -TWRP, now
 	echo [*]--------------------------------------------------------------------
 	pause
 	files\adb.exe reboot erecovery 
@@ -289,7 +301,7 @@ if %erecovery%=="flashed" ( files\fastboot.exe reboot
 	echo [*] RE-RUN THIS STEP Recovery step 1 "FLASH ERECOVERY"
 	echo [*]-------------------------------------------------------------------- 
 	pause )
-cls
+echo.
 GOTO:EOF
 
 
@@ -298,6 +310,17 @@ echo.---------------------------------------------------------------------------
 echo [*] This part of tool MUST be done from TWRP (as root is needed)
 echo.--------------------------------------------------------------------------------
 pause
+if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
+	echo [*]  Continue
+	echo [*] 
+	echo.
+	pause 
+) else ( echo.--------------------------------------------------------------------------------
+	echo [*]  NOT IN ADB MODE--
+	echo [*] THIS IS NOT EXPECTED. COULD BE FOR DIFFERENT REASONS,
+	echo [*]  NO ACTION IS TAKEN FROM SCRIPT AT THIS TIME. 
+	pause 
+	GOTO:EOF )
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
 files\adb.exe pull /tmp/nvme original-nvme
 if exist original-nvme (
@@ -462,10 +485,8 @@ echo.---------------------------------------------------------------------------
 set mode="DISCONNECTED-STATE"
 echo [*] Checking for attached devices with adb (inside android)
 for /f "skip=1 tokens=*" %%i in ('files\adb.exe devices') do set mode="ADB"
-timeout 3
 echo [*] Now Checking for attached devices with fastboot (inside bootloader)
 for /f "tokens=*" %%i in ('files\fastboot.exe devices') do set mode="FASTBOOT"
-timeout 3
 cls	
 files\adb.exe kill-server
 color 0b
