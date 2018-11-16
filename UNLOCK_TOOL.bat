@@ -7,7 +7,7 @@ set mode=unset
 set slock-status=unset
 set erecovery=unset
 set ver=V-4
-@title HUAWEI UNLOCK Tool $ver$
+@title HUAWEI UNLOCK Tool %ver%
 ::Set our default parameters
 @echo off
 color 0b
