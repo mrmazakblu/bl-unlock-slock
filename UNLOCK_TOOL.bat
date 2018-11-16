@@ -198,8 +198,6 @@ for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "fla
 if %slock-status%=="" ( echo [*]--------------------------------------------------------------------
 	echo [*] Fail message not found 
 	set erecovery="slocked" )
-::find /i "FAILED" "flash-slock-message.txt"
-::if errorlevel 1 ( echo some bull-shit here )
 pause
 color 0b	
 cls
@@ -251,23 +249,46 @@ echo.---------------------------------------------------------------------------
 echo [*] press any key to continue the script.
 echo.--------------------------------------------------------------------------------
 pause > nul
-if %erecovery%=="slocked" ( files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img
+if %erecovery%=="slocked" ( files\fastboot.exe flash erecovery_ramdisk files\TWRP_kirin.img 2> flash-twrp-message.txt
 	timeout 5
 	echo.--------------------------------------------------------------------------------
-	echo [*] You must Boot to TWRP Manualy
-	echo [*] Hold volume up AFTER the phone vibrates
-	echo [*] Twrp should boot up. If not, reboot it and try it again
-	echo.--------------------------------------------------------------------------------
-	echo [*] Do NOT continue the modifying phone till mvne is edited
-	echo [*] As long as twrp has booted, do 2,3,4 to modify mvne to unlock bootloader
+	echo [*] TWRP file should have Been flashed, error checking hapens next. 
+	echo [*] 
 	echo.--------------------------------------------------------------------------------
 ) else (
 	echo [*] Slock Flashing HAS FAILED, YOU CANNOT FLASH RECOVERY YET
-	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINNING )
+	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINNING
+	pause
+	GOTO:EOF )
 pause
-files\fastboot.exe reboot
-color 0b	
+if not exist flash-twrp-message.txt ( echo.--------------------------------------------------------------------------------
+	echo [*] flash-twrp-message.txt was NOT created for unknown reason. 
+	echo [*] CANNOT VERIFY IF TWRP was FLASHED
+	echo [*] Return to This step again and FLASH-TWRP Again
+	pause
+	GOTO:EOF )
+set twrp-status=""
+for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-twrp-message.txt""') do set twrp-status="%%A"
+if %twrp-status%=="" ( echo [*]--------------------------------------------------------------------
+	echo [*] Fail message not found 
+	echo [*] Assumed no failed message means TWRP Flashed
+	echo [*]--------------------------------------------------------------------
+	echo [*] NEXT WE NEED TO REBOOT TO SYSTEM SO WE CAN ADB REBOOT TO ERECOVERY
+	set erecovery="flashed" )
 pause
+if %erecovery%=="flashed" ( files\fastboot.exe reboot
+	echo [*]--------------------------------------------------------------------
+	echo [*] WHEN PHONE FINISHED WITH REBOOT, VERIFY ADB IS ENABLED
+	echo [*] AND PRESS ANY BUTTON TO CONTINUE --Run Recovery step 2 "READ"
+	echo [*]--------------------------------------------------------------------
+	pause
+	files\adb.exe reboot erecovery 
+) else (
+	echo [*]--------------------------------------------------------------------
+	echo [*] SOMETHING WENT WRONG. TWRP DOESN'T APPEAR TO HAVE FLASHED
+	echo [*] RE-RUN THIS STEP Recovery step 1 "FLASH ERECOVERY"
+	echo [*]-------------------------------------------------------------------- 
+	pause )
 cls
 GOTO:EOF
 
