@@ -294,7 +294,8 @@ if %erecovery%=="flashed" ( files\fastboot.exe reboot
 	echo [*] Continueing should reboot to e-recovery -TWRP, now
 	echo [*]--------------------------------------------------------------------
 	pause
-	files\adb.exe reboot erecovery 
+	files\adb.exe reboot erecovery
+	set erecovery="rebooted"
 ) else (
 	echo [*]--------------------------------------------------------------------
 	echo [*] SOMETHING WENT WRONG. TWRP DOESN'T APPEAR TO HAVE FLASHED
@@ -308,19 +309,39 @@ GOTO:EOF
 :recovery_2 Read mvne
 echo.--------------------------------------------------------------------------------
 echo [*] This part of tool MUST be done from TWRP (as root is needed)
+echo [*] REBOOTING IF NEEDED
 echo.--------------------------------------------------------------------------------
-pause
+timeout 2
 if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
 	echo [*]  Continue
 	echo [*] 
 	echo.
-	pause 
+	timeout 2 
 ) else ( echo.--------------------------------------------------------------------------------
 	echo [*]  NOT IN ADB MODE--
 	echo [*] THIS IS NOT EXPECTED. COULD BE FOR DIFFERENT REASONS,
 	echo [*]  NO ACTION IS TAKEN FROM SCRIPT AT THIS TIME. 
 	pause 
 	GOTO:EOF )
+if %erecovery%=="rebooted" (
+	echo [*]--------------------------------------------------------------------
+	echo [*] Last action was %erecovery% Continue
+	echo [*]--------------------------------------------------------------------
+	timeout 2
+) else (
+	echo [*]--------------------------------------------------------------------
+	echo [*] Script was not continued From last step, We do not know 
+	echo [*] If device is in TWRP or not
+	echo [*] We will issue reboot command again.
+	echo [*]--------------------------------------------------------------------
+	timeout 2
+	files\adb.exe reboot erecovery
+	set erecovery="rebooted" )
+echo [*]--------------------------------------------------------------------
+echo [*] WHEN DEVICE IS LOADED IN TWRP PRESS ANY BUTTON TO CONTINUE
+echo [*]
+echo [*]--------------------------------------------------------------------
+pause
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
 files\adb.exe pull /tmp/nvme original-nvme
 if exist original-nvme (
@@ -335,7 +356,7 @@ GOTO:EOF
 echo.--------------------------------------------------------------------------------
 echo [*] This part of tool requires only the tool itself
 echo.--------------------------------------------------------------------------------
-pause
+timeout 2
 if exist modified-nvme (
 	call files\JREPL.BAT "\x46\x42\x4C\x4F\x43\x4B\x00\x00\x01\x00\x00\x00\x01" "\x46\x42\x4C\x4F\x43\x4B\x00\x00\x01\x00\x00\x00\x00" /m /x /f modified-nvme /o -
 ) else (
@@ -346,9 +367,20 @@ GOTO:EOF
 
 :recovery_4 Flash Modifyed_mvne
 echo.--------------------------------------------------------------------------------
-echo [*] This part of tool requires to be done from TWRP (as root is needed)
+echo [*] This part of tool MUST be done from TWRP (as root is needed)
 echo.--------------------------------------------------------------------------------
 pause
+if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
+	echo [*]  Continue
+	echo [*] 
+	echo.
+	timeout 2 
+) else ( echo.--------------------------------------------------------------------------------
+	echo [*]  NOT IN ADB MODE--
+	echo [*] THIS IS NOT EXPECTED. COULD BE FOR DIFFERENT REASONS,
+	echo [*]  NO ACTION IS TAKEN FROM SCRIPT AT THIS TIME. 
+	pause 
+	GOTO:EOF )
 if exist modified-nvme (
 	files\adb.exe push modified-nvme /tmp/modified-nvme
 	files\adb.exe shell dd if=/tmp/modified-nvme of=/dev/block/bootdevice/by-name/nvme
