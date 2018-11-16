@@ -9,6 +9,44 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 color 0b
 cd "%~dp0"
 SET PATH=%PATH%;"%~dp0"
+IF EXIST "%~dp0files" SET PATH=%PATH%;"%~dp0\files"
+cls
+echo(
+echo(
+cecho  {0c} ***************************************************{#}{\n}
+cecho   *  {0E}   DO YOU WANT TO DOWNLOAD LATEST SCRIPT {#}      *{\n}
+cecho   *  {06}   OR RUN CURRENT VERSION??  %ver%           {#}       *{\n}
+cecho   {0c}***************************************************{#}{\n}
+echo(
+echo( 
+CHOICE  /C 12 /M "   1=RUN  or   2=UPDATE"
+IF ERRORLEVEL 2 GOTO update
+IF ERRORLEVEL 1 GOTO run
+:update
+IF EXIST "%~dp0unlock-tool-update" rd /s /q "%~dp0unlock-tool-update" /Q
+IF NOT EXIST "%~dp0unlock-tool-update" mkdir "%~dp0unlock-tool-update"
+echo @echo off > %~dp0unlock-tool-update\unlock-tool-update.bat
+echo( >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo timeout 10 >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo IF EXIST "%~dp0unlock-tool-update\bl-unlock-slock-master\files" rd /s /q "%~dp0files" /Q >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo IF EXIST %~dp0unlock-tool-update\bl-unlock-slock-master\files echo d ^| xcopy /Y /E /H  %~dp0unlock-tool-update\bl-unlock-slock-master\files %~dp0files >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo echo f ^| xcopy /Y %~dp0UNLOCK_TOOL.bat %~dp0UNLOCK_TOOL.bak >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo IF EXIST %~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat echo f ^| xcopy /Y %~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat %~dp0UNLOCK_TOOL.bat >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo timeout 5 >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo start %~dp0UNLOCK_TOOL.bat >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo timeout 2 >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo exit >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo Downloading files from GitHub Repo
+files\wget.exe -P %~dp0unlock-tool-update\ https://github.com/mrmazakblu/bl-unlock-slock.git 2> update-logs\tool-download-log.txt
+%~dp0files\unzip.exe -u %~dp0unlock-tool-update\master.zip -d %~dp0unlock-tool-update\
+start %~dp0unlock-tool-update\unlock-tool-update.bat
+echo DONE WITH DOWNLOAD. EXITING NOW TO UPDATE THE FILES AND THIS SCRIPT
+timeout 3
+exit
+:run
+cls
+echo(
+echo(
 
 
 :menuLOOP
