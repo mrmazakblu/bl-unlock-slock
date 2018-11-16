@@ -164,7 +164,7 @@ cls
 GOTO:EOF
 
 
-:menu_2 Flash_custom_recovery         
+:menu_2 Flash_custom_recovery  MVNE       
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ echo [*] This part of tool requires only the tool itself
 echo.--------------------------------------------------------------------------------
 pause
 if exist modified-nvme (
-	call files\nvme-edit.bat
+	call files\JREPL.BAT "\x46\x42\x4C\x4F\x43\x4B\x00\x00\x01\x00\x00\x00\x01" "\x46\x42\x4C\x4F\x43\x4B\x00\x00\x01\x00\x00\x00\x00" /m /x /f modified-nvme /o -
 ) else (
 	echo [**] NVME file not found. Make sure You performed Step 2 First)
 pause
@@ -272,7 +272,7 @@ pause
 cls
 GOTO:EOF
 
-:recovery_5 Flash TWRP(optional)_ONLY-AFTER-#1-IS-DONE 
+:recovery_5 Flash TWRP(optional)_ONLY-AFTER-#4-IS-DONE 
 cls
 color 0b
 echo.--------------------------------------------------------------------------------
