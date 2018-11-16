@@ -2,7 +2,7 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 ::visit https://t.me/huaweihax
 
 ::Set our Window Title
-@title HUAWEI UNLOCK Tool
+@title HUAWEI UNLOCK Tool V-3
 
 ::Set our default parameters
 @echo off
