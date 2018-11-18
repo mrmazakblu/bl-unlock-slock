@@ -6,7 +6,7 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 set mode=unset
 set slock-status=unset
 set erecovery=unset
-set ver=V-4
+set ver=V-5
 @title HUAWEI UNLOCK Tool %ver%
 ::Set our default parameters
 @echo off
@@ -142,7 +142,7 @@ echo.---------------------------------------------------------------------------
 echo.
 pause
 if exist slock.txt (
-	type slock.txt | files/xxd.exe -r -p > res
+	type slock.txt | xxd.exe -r -p > res
 	echo.--------------------------------------------------------------------------------
 	echo [*] Now Run option 3 "FLASH_slock"
 	echo.--------------------------------------------------------------------------------
