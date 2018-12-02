@@ -110,6 +110,7 @@ echo.
 pause )
 files\fastboot.exe oem hwdog certify begin 2> fblock.txt
 files\fastboot.exe oem get-product-model 2>> fblock.txt
+files\fastboot.exe oem get-build-number 2>> fblock.txt
 timeout 3
 if exist fblock.txt ( echo.--------------------------------------------------------------------------------
 	echo [*] Now data has been pulled from phone. Send the fblock.txt
