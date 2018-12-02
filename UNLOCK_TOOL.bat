@@ -6,7 +6,7 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 set mode=unset
 set slock-status=unset
 set erecovery=unset
-set ver=V-5
+set ver=V-7
 @title HUAWEI UNLOCK Tool %ver%
 ::Set our default parameters
 @echo off
@@ -60,6 +60,7 @@ echo(
 :menuLOOP
 
 	call:header
+	call:mode_status
 	::Print our header
 	::call:header
 	if %mode%=="DISCONNECTED-STATE" ( echo.-----------------------------------------------
@@ -98,7 +99,7 @@ cls
 if %mode%=="DISCONNECTED-STATE" ( echo.-----------------------------------------------
 echo [**] This process will not work While phone shows not connected 
 pause
-GOTO:EOF )
+GOTO:menu_1 )
 if %mode%=="ADB" ( echo [*] REBOOTING TO BOOTLOADER
 files\adb.exe reboot bootloader
 echo.--------------------------------------------------------------------------------
@@ -129,7 +130,7 @@ echo.
 pause
 color 0b	
 cls
-GOTO:EOF
+GOTO:menu_1
 
 :slock_2 Convert Slock-txt_to_RES
 cls
@@ -148,13 +149,13 @@ if exist slock.txt (
 	echo.--------------------------------------------------------------------------------
 ) else (
 	echo.--------------------------------------------------------------------------------
-	echo [**] RES file not found. Make sure you copied code received from #niceguys)
+	echo [**] slock.txt file not found. Make sure you copied code received from #niceguys)
 	echo.--------------------------------------------------------------------------------
 echo.
 pause
 color 0b	
 cls
-GOTO:EOF
+GOTO:menu_1
 
 :slock_3 FLASH_slock_RES
 cls
@@ -163,7 +164,7 @@ echo [*] Phone has been rebooted, Your code in no longer VALID
 echo [*] Start over with get-slock
 echo.
 pause 
-GOTO:EOF )
+GOTO:menu_1 )
 if %mode%=="DISCONNECTED-STATE" ( echo.--------------------------------------------------------------------------------
 echo [*] Phone NOT DETECTED, MAKE SURE CABLE IS CONNECTED, TRY AGAIN
 echo.
@@ -187,7 +188,7 @@ if exist res (
 	echo [**] And placd it into same directory as the fblock.txt
 	echo.--------------------------------------------------------------------------------
 	pause
-	GOTO:EOF )
+	GOTO:menu_1 )
 echo.
 pause
 if not exist flash-slock-message.txt ( echo.--------------------------------------------------------------------------------
@@ -196,11 +197,12 @@ if not exist flash-slock-message.txt ( echo.------------------------------------
 	echo [*] Flashing Recovery May Fail. Cannot determine at this time.
 	echo [*] Return to last step again and FLASH-SLOCK Again
 	pause
-	GOTO:EOF )
+	GOTO:menu_1 )
 set slock-status=""
 for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-slock-message.txt""') do set slock-status="%%A"
 if %slock-status%=="" ( echo [*]--------------------------------------------------------------------
 	echo [*] Fail message not found 
+	echo [*] Continue to menu 2 
 	set erecovery="slocked" )
 pause
 color 0b	
@@ -220,7 +222,7 @@ echo.---------------------------------------------------------------------------
 echo.
 for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":recovery_" "%~f0""') do echo.  %%B  %%C
 	set choice=
-	echo.&set /p choice= Please make a selection or hit ENTER to exit: ||GOTO:EOF
+	echo.&set /p choice= Please make a selection or hit ENTER to return to last menu: ||GOTO:EOF
 	echo.&call:recovery_%choice%
 color 0b	
 cls
@@ -234,15 +236,20 @@ if %mode%=="DISCONNECTED-STATE" ( echo.-----------------------------------------
 echo [*] Phone NOT DETECTED, MAKE SURE CABLE IS CONNECTED, TRY AGAIN
 echo.
 pause 
-GOTO:EOF )
+GOTO:menu_2 )
 if %mode%=="ADB" ( echo.--------------------------------------------------------------------------------
 echo [*] Phone has been rebooted, Your code in no longer VALID 
 echo [*] Start over with get-slock
 echo.
 pause 
-GOTO:EOF )
+GOTO:menu_1 )
 if %mode%=="FASTBOOT" ( echo CONTINUE
 ) else (
+	echo.--------------------------------------------------------------------------------
+	echo [*] Fastboot mode not detected by script. Restarting script to check again
+	echo [*] If stuck At this spot again Something outside this script is needed to help
+	echo.--------------------------------------------------------------------------------
+	pause
 	GOTO:EOF )
 echo.--------------------------------------------------------------------------------
 echo [*] Phone should already be in Fastboot Mode
@@ -262,14 +269,14 @@ if %erecovery%=="slocked" ( echo.-----------------------------------------------
 	echo [*] Slock Flashing HAS FAILED, YOU CANNOT FLASH RECOVERY YET
 	echo [*] Try Again To Flash Slock, If fails Again YOU NEED TO START FROM BEGINNING
 	pause
-	GOTO:EOF )
+	GOTO:menu_2 )
 pause
 if not exist flash-twrp-message.txt ( echo.--------------------------------------------------------------------------------
 	echo [*] flash-twrp-message.txt was NOT created for unknown reason. 
 	echo [*] CANNOT VERIFY IF TWRP was FLASHED
 	echo [*] Return to This step again and FLASH-TWRP Again
 	pause
-	GOTO:EOF )
+	GOTO:menu_2 )
 set twrp-status=""
 for /f "tokens=1" %%A in ('"C:/Windows/system32/findstr.exe /b /i /c:"FAIL" "flash-twrp-message.txt""') do set twrp-status="%%A"
 if %twrp-status%=="" ( echo [*]--------------------------------------------------------------------
@@ -285,13 +292,15 @@ if %twrp-status%=="" ( echo [*]-------------------------------------------------
 	echo [*] Return to This step again and FLASH-TWRP Again. But you will most
 	echo [*] Likely need to start over AGAIN 
 	pause
-	GOTO:EOF )
+	GOTO:menu_2 )
 pause
 if %erecovery%=="flashed" ( files\fastboot.exe reboot
 	echo [*]--------------------------------------------------------------------
 	echo [*] WHEN PHONE FINISHED WITH REBOOT, VERIFY ADB IS ENABLED
-	echo [*] AND PRESS ANY BUTTON TO CONTINUE --Run Recovery step 2 "READ"
-	echo [*] Continueing should reboot to e-recovery -TWRP, now
+	echo [*]
+	echo [*] AND PRESS ANY BUTTON TO CONTINUE --Run Recovery step 2 "READ mvne"
+	echo [*]
+	echo [*] Continueing should reboot to e-recovery, Which IS now _TWRP
 	echo [*]--------------------------------------------------------------------
 	pause
 	files\adb.exe reboot erecovery
@@ -303,10 +312,11 @@ if %erecovery%=="flashed" ( files\fastboot.exe reboot
 	echo [*]-------------------------------------------------------------------- 
 	pause )
 echo.
-GOTO:EOF
+GOTO:menu_2
 
 
 :recovery_2 Read mvne
+call:mode_status
 echo.--------------------------------------------------------------------------------
 echo [*] This part of tool MUST be done from TWRP (as root is needed)
 echo [*] REBOOTING IF NEEDED
@@ -319,8 +329,10 @@ if %mode%=="ADB" ( echo.--------------------------------------------------------
 	timeout 2 
 ) else ( echo.--------------------------------------------------------------------------------
 	echo [*]  NOT IN ADB MODE--
+	echo [*] Ensure USB Cable is connected,
 	echo [*] THIS IS NOT EXPECTED. COULD BE FOR DIFFERENT REASONS,
-	echo [*]  NO ACTION IS TAKEN FROM SCRIPT AT THIS TIME. 
+	echo [*] Script will restart to re-check "mode-status" 
+	echo [*] IF YOU END UP HERE AGAIN, THIS SCRIPT WILL NOT BE ABLE TO HELP FURTHER
 	pause 
 	GOTO:EOF )
 if %erecovery%=="rebooted" (
@@ -336,11 +348,11 @@ if %erecovery%=="rebooted" (
 	echo [*]--------------------------------------------------------------------
 	timeout 2
 	files\adb.exe reboot erecovery
-	set erecovery="rebooted" )
-echo [*]--------------------------------------------------------------------
-echo [*] WHEN DEVICE IS LOADED IN TWRP PRESS ANY BUTTON TO CONTINUE
-echo [*]
-echo [*]--------------------------------------------------------------------
+	set erecovery="rebooted"
+	echo [*]--------------------------------------------------------------------
+	echo [*] WHEN DEVICE IS LOADED IN TWRP PRESS ANY BUTTON TO CONTINUE
+	echo [*]
+	echo [*]-------------------------------------------------------------------- )
 pause
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/nvme of=/tmp/nvme
 files\adb.exe pull /tmp/nvme original-nvme
@@ -350,7 +362,7 @@ if exist original-nvme (
 	echo [**] NVME file not found. Make sure twrp is loaded and adb is working )
 pause
 cls
-GOTO:EOF
+GOTO:menu_2
 
 :recovery_3 Modify mvne
 echo.--------------------------------------------------------------------------------
@@ -363,9 +375,10 @@ if exist modified-nvme (
 	echo [**] NVME file not found. Make sure You performed Step 2 First)
 pause
 cls
-GOTO:EOF
+GOTO:menu_2
 
 :recovery_4 Flash Modifyed_mvne
+call:mode_status
 echo.--------------------------------------------------------------------------------
 echo [*] This part of tool MUST be done from TWRP (as root is needed)
 echo.--------------------------------------------------------------------------------
@@ -378,7 +391,8 @@ if %mode%=="ADB" ( echo.--------------------------------------------------------
 ) else ( echo.--------------------------------------------------------------------------------
 	echo [*]  NOT IN ADB MODE--
 	echo [*] THIS IS NOT EXPECTED. COULD BE FOR DIFFERENT REASONS,
-	echo [*]  NO ACTION IS TAKEN FROM SCRIPT AT THIS TIME. 
+	echo [*] Script will restart to re-check "mode-status" 
+	echo [*] IF YOU END UP HERE AGAIN, THIS SCRIPT WILL NOT BE ABLE TO HELP FURTHER
 	pause 
 	GOTO:EOF )
 if exist modified-nvme (
@@ -388,7 +402,7 @@ if exist modified-nvme (
 	echo [**] NVME file not found. Make sure twrp is loaded and adb is working)
 pause
 cls
-GOTO:EOF
+GOTO:menu_2
 
 :recovery_5 Flash TWRP(optional)_ONLY-AFTER-#4-IS-DONE 
 cls
@@ -428,7 +442,7 @@ echo.---------------------------------------------------------------------------
 echo.
 for /f "tokens=1,2,* delims=_ " %%A in ('"C:/Windows/system32/findstr.exe /b /c:":root_" "%~f0""') do echo.  %%B  %%C
 	set choice=
-	echo.&set /p choice= Please make a selection then hit ENTER:
+	echo.&set /p choice= Please make a selection or hit ENTER to return to last menu: ||GOTO:EOF
 	echo.&call:root_%choice%
 color 0b	
 cls
@@ -442,7 +456,7 @@ echo [*] Instaled ramdisk to your pc, then reboot back to Android
 echo [*] Then it will copy that file back into the Download folder.
 echo [*] From inside android you will use the magisk manager to "patch" it.
 echo.--------------------------------------------------------------------------------
-files\adb.exe reboot recovery
+files\adb.exe reboot erecovery
 echo [*] Press any key to continue ONLY when twrp has loaded
 pause 
 files\adb.exe shell dd if=/dev/block/bootdevice/by-name/ramdisk of=/tmp/ramdisk
@@ -452,7 +466,7 @@ echo [*] Press any key to continue ONLY when Device has loaded
 pause 
 files\adb.exe push current-ramdisk.img /sdcard/Download
 timeout 3 > nul
-GOTO:EOF
+GOTO:menu_3
 
 :root_2 Download_Magisk
 cls
@@ -466,7 +480,7 @@ echo [*] Run the app and select to install root. select patch only.
 echo [*] When done Run Step 3
 timeout 5 > nul
 rundll32 url.dll,FileProtocolHandler https://github.com/topjohnwu/Magisk/releases
-GOTO:EOF
+GOTO:menu_3
 
 :root_3 Pull_and _flash-patched_ramdisk
 cls
@@ -479,12 +493,12 @@ if exist patched_boot.img (
 	files\fastboot.exe devices
 	files\fastboot.exe flash ramdisk patched_boot.img
 	files\fastboot.exe reboot
-	timeout 3 > nul
-	GOTO:EOF
 ) else (
 	echo [*] Patched_boot.img not found
-	timeout 3 > nul
-	GOTO:EOF)
+	echo [*] Try again, or do it manually
+	pause )
+timeout 3 > nul
+GOTO:menu_3
 
 :header  
 cls        
@@ -510,6 +524,10 @@ cecho  {02}           "                   |_|                              "{#}{
 cecho  {0a}           """"""""""""""""""""""""""""""""""""""""""""""""""""""{#}{\n}
 cecho  {0c} -----------------------------------------------------------------------------{#}{\n}
 echo.
+color 0b
+GOTO:EOF
+
+:mode_status
 echo [*] Force restarting the adb server. Just in case it might be needed
 files\adb.exe kill-server
 files\adb.exe start-server
