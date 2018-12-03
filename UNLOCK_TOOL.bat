@@ -37,21 +37,21 @@ IF ERRORLEVEL 1 GOTO run
 IF EXIST "%~dp0unlock-tool-update" rd /s /q "%~dp0unlock-tool-update" /Q
 IF NOT EXIST "%~dp0unlock-tool-update" mkdir "%~dp0unlock-tool-update"
 IF NOT EXIST "%~dp0update-logs" mkdir "%~dp0update-logs"
-echo @echo off > %~dp0unlock-tool-update\unlock-tool-update.bat
-echo( >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo timeout 10 >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo IF EXIST "%~dp0unlock-tool-update\bl-unlock-slock-master\files" rd /s /q "%~dp0files" /Q >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo IF EXIST %~dp0unlock-tool-update\bl-unlock-slock-master\files echo d ^| xcopy /Y /E /H  %~dp0unlock-tool-update\bl-unlock-slock-master\files %~dp0files >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo echo f ^| xcopy /Y %~dp0UNLOCK_TOOL.bat %~dp0UNLOCK_TOOL.bak >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo IF EXIST %~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat echo f ^| xcopy /Y %~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat %~dp0UNLOCK_TOOL.bat >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo timeout 5 >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo start %~dp0UNLOCK_TOOL.bat >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo timeout 2 >> %~dp0unlock-tool-update\unlock-tool-update.bat
-echo exit >> %~dp0unlock-tool-update\unlock-tool-update.bat
+echo @echo off > "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo( >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo timeout 10 >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo IF EXIST "%~dp0unlock-tool-update\bl-unlock-slock-master\files" rd /s /q "%~dp0files" /Q >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo IF EXIST "%~dp0unlock-tool-update\bl-unlock-slock-master\files" echo d ^| xcopy /Y /E /H  "%~dp0unlock-tool-update\bl-unlock-slock-master\files" "%~dp0files" >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo echo f ^| xcopy /Y "%~dp0UNLOCK_TOOL.bat" "%~dp0UNLOCK_TOOL.bak" >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo IF EXIST "%~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat" echo f ^| xcopy /Y "%~dp0unlock-tool-update\bl-unlock-slock-master\UNLOCK_TOOL.bat" "%~dp0UNLOCK_TOOL.bat" >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo timeout 5 >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo start "%~dp0UNLOCK_TOOL.bat" >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo timeout 2 >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
+echo exit >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
 echo Downloading files from GitHub Repo
-files\wget.exe -P %~dp0unlock-tool-update\ https://github.com/mrmazakblu/bl-unlock-slock/archive/master.zip 2> update-logs\tool-download-log.txt
-%~dp0files\unzip.exe -u %~dp0unlock-tool-update\master.zip -d %~dp0unlock-tool-update\
-start %~dp0unlock-tool-update\unlock-tool-update.bat
+files\wget.exe -P "%~dp0unlock-tool-update\" https://github.com/mrmazakblu/bl-unlock-slock/archive/master.zip 2> "update-logs\tool-download-log.txt"
+"%~dp0files\unzip.exe" -u "%~dp0unlock-tool-update\master.zip" -d "%~dp0unlock-tool-update\"
+start "%~dp0unlock-tool-update\unlock-tool-update.bat"
 echo DONE WITH DOWNLOAD. EXITING NOW TO UPDATE THE FILES AND THIS SCRIPT
 timeout 3
 exit
