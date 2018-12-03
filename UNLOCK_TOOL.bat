@@ -1,6 +1,6 @@
+@echo off
 if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 ::visit https://t.me/huaweihax
-
 ::Set our Window Title
 ::DECLARE VARIABLES
 set mode=unset
@@ -8,8 +8,11 @@ set slock-status=unset
 set erecovery=unset
 set ver=V-7
 @title HUAWEI UNLOCK Tool %ver%
+:: Check for newest version
+echo CHECKING FOR NEWEST VERSION
+::"%~dp0files\wget" -O "%~dp0files\current_version.txt" https://raw.githubusercontent.com/mrmazakblu/Huawei-firmware-downloader/master/bin/current_version.txt
+< "%~dp0files\current_version.txt" ( set /p "newver=" )
 ::Set our default parameters
-@echo off
 color 0b
 cd "%~dp0"
 SET PATH=%PATH%;"%~dp0"
@@ -18,6 +21,7 @@ cls
 echo(
 echo(
 cecho  {0c} ***************************************************{#}{\n}
+echo   *     Newest Version IS %newver%                      *
 cecho   *  {0E}   DO YOU WANT TO DOWNLOAD LATEST SCRIPT {#}      *{\n}
 cecho   *  {06}   OR RUN CURRENT VERSION??  %ver%           {#}       *{\n}
 cecho   {0c}***************************************************{#}{\n}
@@ -525,7 +529,6 @@ cecho  {02}           "                   |_|                              "{#}{
 cecho  {0a}           """"""""""""""""""""""""""""""""""""""""""""""""""""""{#}{\n}
 cecho  {0c} -----------------------------------------------------------------------------{#}{\n}
 echo.
-color 0b
 GOTO:EOF
 
 :mode_status
@@ -540,7 +543,6 @@ echo [*] Now Checking for attached devices with fastboot (inside bootloader)
 for /f "tokens=*" %%i in ('files\fastboot.exe devices') do set mode="FASTBOOT"
 cls	
 files\adb.exe kill-server
-color 0b
 GOTO:EOF
 
 :printstatus
