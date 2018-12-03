@@ -50,7 +50,7 @@ echo timeout 2 >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
 echo exit >> "%~dp0unlock-tool-update\unlock-tool-update.bat"
 echo Downloading files from GitHub Repo
 "%~dp0files\wget.exe" -P "%~dp0unlock-tool-update" https://github.com/mrmazakblu/bl-unlock-slock/archive/master.zip 2> "update-logs\tool-download-log.txt"
-"%~dp0files\unzip.exe" -u "%~dp0unlock-tool-update\master.zip" -d "%~dp0unlock-tool-update\"
+"%~dp0files\unzip.exe" -u "%~dp0unlock-tool-update\master.zip" -d "%~dp0unlock-tool-update"
 start %~dp0unlock-tool-update\unlock-tool-update.bat
 echo DONE WITH DOWNLOAD. EXITING NOW TO UPDATE THE FILES AND THIS SCRIPT
 timeout 3
