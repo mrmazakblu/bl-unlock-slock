@@ -10,7 +10,7 @@ set ver=V-7
 @title HUAWEI UNLOCK Tool %ver%
 :: Check for newest version
 echo CHECKING FOR NEWEST VERSION
-::"%~dp0files\wget" -O "%~dp0files\current_version.txt" https://raw.githubusercontent.com/mrmazakblu/Huawei-firmware-downloader/master/bin/current_version.txt
+"%~dp0files\wget" -O "%~dp0files\current_version.txt" https://raw.githubusercontent.com/mrmazakblu/bl-unlock-slock/master/files/current_version.txt
 < "%~dp0files\current_version.txt" ( set /p "newver=" )
 ::Set our default parameters
 color 0b
