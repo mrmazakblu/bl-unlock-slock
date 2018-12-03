@@ -6,7 +6,7 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 set mode=unset
 set slock-status=unset
 set erecovery=unset
-set ver=V-7
+set ver=V-8
 @title HUAWEI UNLOCK Tool %ver%
 :: Check for newest version
 echo CHECKING FOR NEWEST VERSION
