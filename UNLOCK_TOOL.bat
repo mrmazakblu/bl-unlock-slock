@@ -17,11 +17,14 @@ color 0b
 cd "%~dp0"
 SET PATH=%PATH%;"%~dp0"
 IF EXIST "%~dp0files" SET PATH=%PATH%;"%~dp0\files"
+IF "%newver%" == "" SET newver=Failed_To_Retreave
+::echo %newver%
+::pause
 cls
 echo(
 echo(
 cecho  {0c} ***************************************************{#}{\n}
-echo   *     Newest Version IS %newver%                      *
+echo   *     Newest Version IS "%newver%"                      *
 cecho   *  {0E}   DO YOU WANT TO DOWNLOAD LATEST SCRIPT {#}      *{\n}
 cecho   *  {06}   OR RUN CURRENT VERSION??  %ver%           {#}       *{\n}
 cecho   {0c}***************************************************{#}{\n}
